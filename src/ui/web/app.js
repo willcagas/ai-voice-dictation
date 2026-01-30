@@ -37,7 +37,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closeMenuBtn = document.getElementById('close-menu-btn');
     const modeToggleBtn = document.getElementById('mode-toggle-btn');
 
-    if (idleMic) idleMic.addEventListener('click', showMenu);
+    if (idleMic) {
+        // Handle click manually to distinguishing drag/long-press
+        let startX, startY, startTime;
+
+        idleMic.addEventListener('mousedown', (e) => {
+            startX = e.screenX;
+            startY = e.screenY;
+            startTime = Date.now();
+        });
+
+        idleMic.addEventListener('mouseup', (e) => {
+            const diffX = Math.abs(e.screenX - startX);
+            const diffY = Math.abs(e.screenY - startY);
+            const duration = Date.now() - startTime;
+
+            // Only toggle if minimal movement (not a drag) AND short duration (tap)
+            if (diffX < 5 && diffY < 5 && duration < 300) {
+                showMenu();
+            }
+        });
+    }
     if (closeMenuBtn) closeMenuBtn.addEventListener('click', showIdle);
     if (modeToggleBtn) modeToggleBtn.addEventListener('click', toggleMode);
 });

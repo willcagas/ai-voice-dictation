@@ -2,6 +2,7 @@
 
 // DOM Elements
 const overlay = document.getElementById('overlay');
+const idleState = document.getElementById('idle-state');
 const recordingState = document.getElementById('recording-state');
 const processingState = document.getElementById('processing-state');
 const successState = document.getElementById('success-state');
@@ -28,21 +29,42 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Could not get initial state:', e);
         }
     }
+    // Start in idle state
+    showIdle();
 });
 
 // Hide all states
 function hideAllStates() {
+    idleState.classList.add('hidden');
     recordingState.classList.add('hidden');
     processingState.classList.add('hidden');
     successState.classList.add('hidden');
 }
 
-// Show recording state with waveform
+// Show idle state (small persistent icon)
+function showIdle() {
+    stopWaveformAnimation();
+    hideAllStates();
+    idleState.classList.remove('hidden');
+
+    // Contract to circle
+    overlay.classList.remove('active');
+    overlay.classList.remove('hidden');
+    overlay.classList.remove('fade-out');
+    overlay.classList.add('idle');
+}
+
+// Show recording state with waveform (expanded)
 function showRecording() {
-    overlay.classList.remove('hidden', 'fade-out');
     hideAllStates();
     recordingState.classList.remove('hidden');
     updateModeDisplay();
+
+    // Expand window
+    overlay.classList.remove('idle');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('active');
+
     startWaveformAnimation();
 }
 
@@ -106,27 +128,22 @@ function showProcessing() {
     stopWaveformAnimation();
     hideAllStates();
     processingState.classList.remove('hidden');
+    // Ensure active state
+    overlay.classList.remove('idle');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('active');
 }
 
-// Show success and auto-hide
+// Show success and return to idle
 function showSuccess() {
     stopWaveformAnimation();
     hideAllStates();
     successState.classList.remove('hidden');
 
-    // Auto-hide after 1 second
+    // Return to idle after delay
     setTimeout(() => {
-        hideOverlay();
-    }, 1000);
-}
-
-// Hide overlay with animation
-function hideOverlay() {
-    overlay.classList.add('fade-out');
-    setTimeout(() => {
-        overlay.classList.add('hidden');
-        overlay.classList.remove('fade-out');
-    }, 300);
+        showIdle();
+    }, 1500);
 }
 
 // Update mode display
@@ -146,10 +163,10 @@ function updateAutoPaste(enabled) {
 }
 
 // Expose functions to window for pywebview
+window.showIdle = showIdle;
 window.showRecording = showRecording;
 window.updateWaveform = updateWaveform;
 window.showProcessing = showProcessing;
 window.showSuccess = showSuccess;
-window.hideOverlay = hideOverlay;
 window.updateMode = updateMode;
 window.updateAutoPaste = updateAutoPaste;

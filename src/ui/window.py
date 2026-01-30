@@ -121,7 +121,7 @@ class DictationWindow:
             transparent=True,
             resizable=False,
             js_api=self._api,
-            hidden=True  # Start hidden
+            hidden=False  # Start visible (idle state)
         )
         self._window.events.loaded += self._on_loaded
     
@@ -152,7 +152,6 @@ class DictationWindow:
     def show_recording(self) -> None:
         """Show the overlay with recording state."""
         if self._window:
-            self._window.show()
             self._window.evaluate_js("showRecording()")
     
     def update_waveform(self, amplitude: float) -> None:
@@ -171,14 +170,14 @@ class DictationWindow:
             self._window.evaluate_js("showProcessing()")
     
     def show_success(self) -> None:
-        """Flash success indicator then hide."""
+        """Flash success indicator then return to idle."""
         if self._window:
             self._window.evaluate_js("showSuccess()")
     
     def hide(self) -> None:
-        """Hide the overlay window."""
+        """Return to idle state (mic icon)."""
         if self._window:
-            self._window.hide()
+            self._window.evaluate_js("showIdle()")
     
     def update_mode(self, mode: str) -> None:
         """Update the mode in the UI."""

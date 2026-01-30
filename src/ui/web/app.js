@@ -32,12 +32,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Start in idle state
     showIdle();
 
-    // Add click handler for mode toggle
+    // Event listeners
     const idleMic = document.querySelector('.idle-mic');
-    if (idleMic) {
-        idleMic.addEventListener('click', toggleMode);
-    }
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+    const modeToggleBtn = document.getElementById('mode-toggle-btn');
+
+    if (idleMic) idleMic.addEventListener('click', showMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', showIdle);
+    if (modeToggleBtn) modeToggleBtn.addEventListener('click', toggleMode);
 });
+
+// Show mode selection menu
+function showMenu() {
+    hideAllStates();
+    document.getElementById('settings-state').classList.remove('hidden');
+
+    overlay.classList.remove('idle');
+    overlay.classList.remove('active');
+    overlay.classList.add('menu-open');
+
+    // Update menu UI labels
+    updateMenuDisplay();
+}
 
 // Toggle between modes
 async function toggleMode() {
@@ -46,7 +62,14 @@ async function toggleMode() {
 
     // Update local UI
     updateModeDisplay();
-    showModeChangeFeedback();
+    updateMenuDisplay();
+
+    // Show feedback in menu
+    const label = document.getElementById('settings-mode-label');
+    if (label) {
+        label.style.transform = 'scale(1.1)';
+        setTimeout(() => label.style.transform = 'scale(1)', 200);
+    }
 
     // Update Python backend
     if (window.pywebview && window.pywebview.api) {
@@ -58,24 +81,17 @@ async function toggleMode() {
     }
 }
 
-// Show brief visual feedback when mode changes (flash icon)
-function showModeChangeFeedback() {
-    const idleMic = document.querySelector('.idle-mic');
-    if (!idleMic) return;
+// Update menu UI elements
+function updateMenuDisplay() {
+    const modeLabel = document.getElementById('settings-mode-label');
+    const modeControl = document.getElementById('mode-toggle-btn');
 
-    // Remove existing classes to restart animation
-    idleMic.classList.remove('flash-email', 'flash-message');
+    if (modeLabel) modeLabel.textContent = currentMode.toUpperCase();
 
-    // Trigger reflow
-    void idleMic.offsetWidth;
-
-    // Add flash class based on mode
-    idleMic.classList.add(currentMode === 'email' ? 'flash-email' : 'flash-message');
-
-    // Clean up after animation
-    setTimeout(() => {
-        idleMic.classList.remove('flash-email', 'flash-message');
-    }, 800);
+    if (modeControl) {
+        modeControl.classList.remove('show-email', 'show-message');
+        modeControl.classList.add(`show-${currentMode}`);
+    }
 }
 
 // Hide all states
@@ -84,6 +100,7 @@ function hideAllStates() {
     recordingState.classList.add('hidden');
     processingState.classList.add('hidden');
     successState.classList.add('hidden');
+    document.getElementById('settings-state').classList.add('hidden');
 }
 
 // Show idle state (small persistent icon)
@@ -94,9 +111,13 @@ function showIdle() {
 
     // Contract to circle
     overlay.classList.remove('active');
+    overlay.classList.remove('menu-open');
     overlay.classList.remove('hidden');
     overlay.classList.remove('fade-out');
     overlay.classList.add('idle');
+
+    // Update idle icon display
+    updateModeDisplay();
 }
 
 // Show recording state with waveform (expanded)
@@ -107,6 +128,7 @@ function showRecording() {
 
     // Expand window
     overlay.classList.remove('idle');
+    overlay.classList.remove('menu-open');
     overlay.classList.remove('hidden');
     overlay.classList.add('active');
 
@@ -175,6 +197,7 @@ function showProcessing() {
     processingState.classList.remove('hidden');
     // Ensure active state
     overlay.classList.remove('idle');
+    overlay.classList.remove('menu-open');
     overlay.classList.remove('hidden');
     overlay.classList.add('active');
 }
@@ -193,7 +216,6 @@ function showSuccess() {
 
 // Update mode display
 function updateModeDisplay() {
-    // Update badge text
     modeBadge.textContent = currentMode.toUpperCase();
     modeBadge.classList.toggle('message', currentMode === 'message');
 
@@ -211,6 +233,7 @@ function updateModeDisplay() {
 function updateMode(mode) {
     currentMode = mode;
     updateModeDisplay();
+    updateMenuDisplay();
 }
 
 function updateAutoPaste(enabled) {

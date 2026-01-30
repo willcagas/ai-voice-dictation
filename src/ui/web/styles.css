@@ -302,3 +302,99 @@ body {
         transform: scale(0.95);
     }
 }
+
+/* Menu/Settings State */
+#settings-state {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+.control-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.close-btn .icon-svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+/* Mode Control Button */
+.mode-control {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    margin: 0 12px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    height: 40px;
+}
+
+.mode-control:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.current-mode-icon .icon-svg {
+    width: 20px;
+    height: 20px;
+    display: none;
+}
+
+/* Show correct icon inside control */
+.mode-control.show-email .icon-email {
+    display: block;
+    color: #667eea;
+}
+
+.mode-control.show-message .icon-message {
+    display: block;
+    color: #38ef7d;
+}
+
+.mode-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: white;
+}
+
+.mode-switch-arrow {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: bold;
+}
+
+/* Menu expansion overwrites */
+.overlay.menu-open {
+    width: 280px;
+    height: 60px;
+    background: rgba(30, 30, 30, 0.98);
+    border-radius: 30px;
+    bottom: 5px;
+    cursor: default;
+}

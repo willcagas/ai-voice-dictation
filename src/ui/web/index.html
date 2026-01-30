@@ -32,6 +32,33 @@
             </div>
         </div>
 
+        <!-- Settings/Menu State -->
+        <div id="settings-state" class="state hidden">
+            <!-- Close Button -->
+            <div class="control-btn close-btn" id="close-menu-btn">
+                <svg viewBox="0 0 24 24" class="icon-svg">
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+            </div>
+
+            <!-- Mode Toggle Control -->
+            <div class="mode-control" id="mode-toggle-btn">
+                <div class="current-mode-icon">
+                    <svg class="icon-svg icon-email" viewBox="0 0 24 24">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg>
+                    <svg class="icon-svg icon-message" viewBox="0 0 24 24">
+                        <path
+                            d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+                    </svg>
+                </div>
+                <div class="mode-label" id="settings-mode-label">EMAIL</div>
+                <div class="mode-switch-arrow">⇄</div>
+            </div>
+        </div>
+
         <!-- Recording State -->
         <div id="recording-state" class="state hidden">
             <div class="status-icon recording-icon">

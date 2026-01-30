@@ -8,13 +8,14 @@
     <key>ProgramArguments</key>
     <array>
         <string>/path/to/ai-dictation/scripts/run.sh</string>
+        <string>--ui</string>
     </array>
     
     <key>RunAtLoad</key>
     <true/>
     
     <key>KeepAlive</key>
-    <false/>
+    <true/>
     
     <key>WorkingDirectory</key>
     <string>/path/to/ai-dictation</string>

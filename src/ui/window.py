@@ -87,24 +87,51 @@ class DictationWindow:
         self._screen_height = 1080
     
     def _handle_ui_state_change(self, state: str) -> None:
-        """Resize and reposition window based on UI state."""
+        """Resize and reposition window based on UI state within current screen bounds."""
         if not self._window:
             return
             
-        # Run on main thread via command queue not possible for window ops?
-        # Pywebview window methods are thread-safe usually.
+        try:
+            # Get current geometry
+            curr_x = self._window.x
+            curr_y = self._window.y
+            curr_w = self._window.width
+            curr_h = self._window.height
+            
+            # Fallback for platforms not reporting geometry?
+            if curr_x is None: curr_x = 0
+            if curr_y is None: curr_y = 0
+            # On creation, width/height should be valid
+        except Exception:
+            # If getting geometry fails, abort resizing relative to center
+            # and just fallback to bottom center default?
+            # For now, let's try to proceed carefully.
+            curr_x, curr_y = 0, 0
+            curr_w, curr_h = 60, 60
+
+        # Calculate center
+        center_x = curr_x + (curr_w // 2)
+        center_y = curr_y + (curr_h // 2)
         
         if state == 'idle':
-            width, height = 60, 60
+            new_w, new_h = 60, 60
         else: # expanded
-            width, height = 260, 80
+            new_w, new_h = 260, 80
             
-        # Recalculate position (bottom center)
-        x = (self._screen_width - width) // 2
-        y = self._screen_height - height - 30
+        # Calculate new top-left to preserve center
+        new_x = center_x - (new_w // 2)
+        new_y = center_y - (new_h // 2)
         
-        self._window.resize(width, height)
-        self._window.move(x, y)
+        # Clamp to screen bounds with padding
+        padding = 10
+        max_x = self._screen_width - new_w - padding
+        max_y = self._screen_height - new_h - padding
+        
+        new_x = max(padding, min(new_x, max_x))
+        new_y = max(padding, min(new_y, max_y))
+        
+        self._window.resize(new_w, new_h)
+        self._window.move(int(new_x), int(new_y))
     
     def _process_commands(self) -> None:
         """Process queued JS commands (called from webview thread)."""

@@ -6,6 +6,7 @@ Copies text to clipboard (always) and optionally pastes via ⌘V.
 """
 
 import subprocess
+import time
 
 from .utils import setup_logging
 
@@ -98,6 +99,8 @@ class Injector:
         success = self.copy_to_clipboard(text)
         
         if success and auto_paste:
+            # Small delay to ensure clipboard is ready
+            time.sleep(0.1)
             self.paste()
         
         return success

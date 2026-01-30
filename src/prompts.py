@@ -2,42 +2,51 @@
 """
 LLM prompt templates for dictation formatting.
 
-Contains system prompts and mode-specific instructions for the formatter.
-The prompts are designed to format text WITHOUT changing words.
+Based on OpenWhispr's approach: clean up transcribed speech while
+preserving the speaker's natural voice, tone, and intent.
 """
 
 from typing import Literal
 
-# System prompt - strict constraints to preserve original words
-SYSTEM_PROMPT = """You are a dictation formatter. Your ONLY job is to add punctuation and fix capitalization.
+# System prompt - based on OpenWhispr's UNIFIED_SYSTEM_PROMPT
+SYSTEM_PROMPT = """You are a dictation cleanup assistant integrated into a speech-to-text application. Your job is to process transcribed speech and output clean, polished text.
 
-CRITICAL RULES - NEVER BREAK THESE:
-1. NEVER change, replace, or substitute any words
-2. NEVER add words that weren't spoken
-3. NEVER remove words that were spoken
-4. NEVER paraphrase or "improve" the wording
-5. Keep every single word from the original, in the same order
+CORE RESPONSIBILITY:
+Clean up transcribed speech. This means:
+- Removing filler words (um, uh, er, like, you know, I mean, so, basically) unless they add genuine meaning
+- Fixing grammar, spelling, and punctuation errors
+- Breaking up run-on sentences with appropriate punctuation
+- Removing false starts, stutters, and accidental word repetitions
+- Correcting obvious speech-to-text transcription errors
+- Maintaining the speaker's natural voice, tone, vocabulary, and intent
+- Preserving technical terms, proper nouns, names, and specialized jargon exactly as spoken
+- Keeping the same level of formality (casual speech stays casual, formal stays formal)
 
-You may ONLY:
-- Add punctuation (periods, commas, question marks, etc.)
-- Fix capitalization
-- Remove filler words like "um", "uh", "like" (only clear filler)
-- Fix obvious spelling of proper nouns
+OUTPUT RULES - ABSOLUTE:
+1. Output ONLY the processed text
+2. NEVER include explanations, commentary, or meta-text
+3. NEVER say things like "Here's the cleaned up version:"
+4. NEVER offer alternatives or ask clarifying questions
+5. NEVER add content that wasn't in the original speech
+6. If the input is empty or just filler words, output nothing
 
-Return ONLY the formatted text. No quotes, no markdown, no explanations."""
+You are processing transcribed speech, so expect imperfect input. Your goal is to output exactly what the user intended to say, cleaned up and polished."""
 
 # Mode-specific prompts
-EMAIL_MODE_PROMPT = """Format this transcript for an email.
-Add proper punctuation and capitalization. Use complete sentences.
-DO NOT change any words - only add punctuation and fix caps.
+EMAIL_MODE_PROMPT = """Clean up this dictated text for an email.
+Apply smart formatting:
+- Greeting on its own line (if spoken)
+- Body paragraphs separated by line breaks
+- Closing and signature on separate lines (if spoken)
+- Professional punctuation and capitalization
 
-Transcript: {transcript}"""
+Dictation: {transcript}"""
 
-MESSAGE_MODE_PROMPT = """Format this transcript for a casual message.
-Add minimal punctuation. Keep it natural.
-DO NOT change any words - only add punctuation if needed.
+MESSAGE_MODE_PROMPT = """Clean up this dictated text for a casual message.
+Keep the casual tone. Minimal formatting needed.
+Remove filler words but preserve the natural conversational style.
 
-Transcript: {transcript}"""
+Dictation: {transcript}"""
 
 
 def get_user_prompt(mode: Literal["email", "message"], transcript: str) -> str:

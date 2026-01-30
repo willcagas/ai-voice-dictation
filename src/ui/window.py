@@ -93,13 +93,29 @@ class DictationWindow:
     
     def create_window(self) -> None:
         """Create the webview window. Must be called before start()."""
+        # Get screen dimensions to position at bottom center
+        try:
+            from AppKit import NSScreen
+            screen = NSScreen.mainScreen()
+            screen_width = int(screen.frame().size.width)
+            screen_height = int(screen.frame().size.height)
+        except Exception:
+            # Fallback dimensions
+            screen_width = 1920
+            screen_height = 1080
+        
+        window_width = 280
+        window_height = 70
+        x = (screen_width - window_width) // 2
+        y = screen_height - window_height - 60  # 60px from bottom
+        
         self._window = webview.create_window(
             title='AI Voice Dictation',
             url=str(WEB_DIR / "index.html"),
-            width=320,
-            height=100,
-            x=100,
-            y=100,
+            width=window_width,
+            height=window_height,
+            x=x,
+            y=y,
             frameless=True,
             on_top=True,
             transparent=True,

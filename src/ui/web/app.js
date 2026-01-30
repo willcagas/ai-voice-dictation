@@ -242,15 +242,10 @@ function showProcessing() {
 }
 
 // Show success and return to idle
+// Show success (skip visual confirmation as per request) and return to idle
 function showSuccess() {
-    stopWaveformAnimation();
-    hideAllStates();
-    successState.classList.remove('hidden');
-
-    // Return to idle after delay
-    setTimeout(() => {
-        showIdle();
-    }, 1500);
+    // Immediately return to idle state
+    showIdle();
 }
 
 // Update mode display

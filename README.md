@@ -91,6 +91,46 @@ To enable auto-paste (`AUTO_PASTE=true`), grant Accessibility access:
 2. Restart the app
 3. Text will now paste directly into the focused application
 
+## Launch at Login
+
+To have AI Voice Dictation start automatically when you log in:
+
+### Install
+
+```bash
+./scripts/install_launchagent.sh
+```
+
+This will:
+- Copy the LaunchAgent plist to `~/Library/LaunchAgents/`
+- Load the agent immediately
+- Configure it to start on every login
+
+### Start/Stop Manually
+
+```bash
+# Start
+launchctl start com.user.aidictation
+
+# Stop
+launchctl stop com.user.aidictation
+```
+
+### Uninstall
+
+```bash
+./scripts/uninstall_launchagent.sh
+```
+
+### Logs
+
+If something isn't working, check the logs:
+
+```bash
+tail -f /tmp/aidictation.out.log
+tail -f /tmp/aidictation.err.log
+```
+
 ## License
 
 MIT

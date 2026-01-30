@@ -106,6 +106,13 @@ To have AViD run automatically at login (and restart if it crashes):
 ./scripts/install_launchagent.sh
 ```
 
+> **Note**: If you encounter a "Permission denied" error or "Operation not permitted", run this command to fix ownership of your LaunchAgents directory:
+> ```bash
+> sudo chown -R $(whoami) ~/Library/LaunchAgents
+> // And try installing again
+> ./scripts/install_launchagent.sh
+> ```
+
 ### Making Changes
 
 If you modify the code, you can instantly reload the background service without restarting your computer:

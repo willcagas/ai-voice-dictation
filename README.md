@@ -1,39 +1,44 @@
-# AI Voice Dictation
 
-A lightweight, personal dictation tool for macOS that uses:
+<div align="center">
+  <img src="assets/avid_logo.png" width="128" height="128" alt="AViD Logo">
+  <h1>AViD</h1>
+  <h3>AI VoIce Dictation</h3>
+  <p>Experimental internal tool for high-speed, AI-formatted voice input on macOS.</p>
+</div>
 
-- **Local ASR**: `whisper.cpp` (fast, private for audio)
-- **AI formatting**: Cloud LLM to rewrite into **Email mode** or **Message mode**
-- **Push-to-talk**: Hold a key to record, release to transcribe + rewrite + paste
+---
 
-## Features
+> **internal-tool**: This project is built primarily for the creator's personal workflow. <br>
+> You are free to fork and use it, but you must bring your own **OpenAI API Key** for the AI formatting features. Support is limited.
 
-- Push-to-talk dictation with configurable hotkey
-- Two output modes: Email (professional) and Message (casual)
-- Local speech-to-text via whisper.cpp (audio stays private)
-- Cloud LLM formatting (only text sent, not audio)
-- Auto-paste into focused application (optional)
-- Low CPU overhead when idle
+## Overview
 
-## Requirements
+**AViD** allows you to dictate text using Push-to-Talk, transcibing it locally with `whisper.cpp` for speed and privacy, then instantly rewriting it via GPT-4o into professional emails or casual messages before auto-pasting it into your active window.
 
-- macOS (Apple Silicon: M4 Pro/Max)
-- Python 3.11+
-- whisper.cpp (via Homebrew)
-- OpenAI API key (for LLM formatting)
+- **Local Transcription**: Uses `whisper.cpp` (Metal accelerated) for fast, private ASR.
+- **AI Formatting**: Cloud LLM rewrites your raw speech into structured text.
+- **Push-to-Talk**: Hold `Right Option` (configurable) to record. Release to process.
+- **Context Aware**: Two distinct modes—**Email** (Professional) and **Message** (Casual).
+- **Auto-Paste**: Directly injects the formatted text into your focused application.
 
-## Quick Start
+## Prerequisites
 
-### Install Dependencies
+- **macOS** (Optimized for Apple Silicon)
+- **Python 3.11+**
+- **Homebrew**
+- **OpenAI API Key** (Required for LLM formatting)
+
+## Setup Guide
+
+### 1. Install System Dependencies
 
 ```bash
 brew install whisper-cpp
-python3 -m venv .venv
-source .venv/bin/activate
-pip install sounddevice numpy pynput python-dotenv requests scipy
 ```
 
-### Download Whisper Model
+### 2. Download Whisper Model
+
+Download a model for local transcription (Base English recommended for speed/accuracy balance):
 
 ```bash
 mkdir -p ~/models/whisper
@@ -41,110 +46,83 @@ cd ~/models/whisper
 curl -L -o ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
 ```
 
-### Configure
+### 3. Clone & Python Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/avid.git
+cd avid
+
+# Setup Virtual Environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install Python Requirements
+pip install sounddevice numpy pynput python-dotenv requests scipy pywebview
+```
+
+### 4. Configuration
+
+Create your `.env` file and add your credentials:
 
 ```bash
 cp .env.example .env
-# Edit .env to add your OPENAI_API_KEY and adjust settings
 ```
 
-### Run
-
-```bash
-python -m src.main
+Edit `.env` with your API Key:
 ```
-
-### Run with UI Overlay
-
-For visual feedback with waveform and sound cues:
-
-```bash
-python -m src.main --ui
+OPENAI_API_KEY=sk-your-key-here
+PTT_KEY=alt_r
+AUTO_PASTE=true
 ```
-
-This shows a floating overlay that displays:
-- 🎤 Waveform visualization while recording
-- ⏳ Processing spinner during transcription
-- ✓ Success indicator when done
-- Sound feedback on start/stop
-
-## Configuration
-
-See `.env.example` for all available configuration options:
-
-- `OPENAI_API_KEY` - Your OpenAI API key
-- `LLM_MODEL` - Model to use for formatting (default: gpt-4o-mini)
-- `MODE` - Default mode: email or message
-- `AUTO_PASTE` - Auto-paste into focused app (requires Accessibility permission)
-- `WHISPER_BIN` - Path to whisper-cpp binary
-- `WHISPER_MODEL_PATH` - Path to whisper model file
-- `PTT_KEY` - Push-to-talk key (default: alt_r)
 
 ## Permissions
 
-### Microphone Access
-Required for recording. macOS will prompt automatically on first use.
+AViD needs system permissions to function correctly:
+1.  **Microphone**: For recording audio.
+2.  **Accessibility**: For simulating keystrokes (Auto-Paste). Go to **System Settings > Privacy & Security > Accessibility** and add your **Terminal** or IDE (e.g., VSCode, iTerm).
 
-### Accessibility (for Auto-paste)
+## Usage
 
-To enable auto-paste (`AUTO_PASTE=true`), grant Accessibility access:
+### Manual Run
 
-1. Open **System Settings** → **Privacy & Security** → **Accessibility**
-2. Click the **+** button
-3. Add **Terminal** (or your IDE, e.g., VS Code, iTerm)
-4. Toggle it **ON**
+To test the application with the UI overlay:
 
-> **Note**: If the app still shows "not trusted" warnings, try removing and re-adding it from the list.
+```bash
+source .venv/bin/activate
+python -m src.main --ui
+```
 
-### Enable Auto-paste
+- **Hold** `Right Option` to record.
+- **Speak** your thought.
+- **Release** to process.
+- The overlay will show the status; text will auto-paste when ready.
 
-1. Edit your `.env` file:
-   ```
-   AUTO_PASTE=true
-   ```
-2. Restart the app
-3. Text will now paste directly into the focused application
+### Install as Background Service (Recommended)
 
-## Launch at Login
-
-To have AI Voice Dictation start automatically when you log in:
-
-### Install
+To have AViD run automatically at login (and restart if it crashes):
 
 ```bash
 ./scripts/install_launchagent.sh
 ```
 
-This will:
-- Copy the LaunchAgent plist to `~/Library/LaunchAgents/`
-- Load the agent immediately
-- Configure it to start on every login
+### Making Changes
 
-### Start/Stop Manually
+If you modify the code, you can instantly reload the background service without restarting your computer:
 
 ```bash
-# Start
-launchctl start com.user.aidictation
-
-# Stop
-launchctl stop com.user.aidictation
+./scripts/reload.sh
 ```
 
-### Uninstall
+## Project Structure
 
-```bash
-./scripts/uninstall_launchagent.sh
-```
-
-### Logs
-
-If something isn't working, check the logs:
-
-```bash
-tail -f /tmp/aidictation.out.log
-tail -f /tmp/aidictation.err.log
-```
+- `src/main.py`: Application entry point.
+- `src/audio.py`: Audio recording via `sounddevice`.
+- `src/transcribe.py`: Local transcription handling.
+- `src/format_llm.py`: Logic for GPT-4o formatting.
+- `src/ui/`: WebView based UI overlay (HTML/CSS/JS).
+- `launchd/`: macOS LaunchAgent configuration.
 
 ## License
 
-MIT
+MIT - Use at your own risk.

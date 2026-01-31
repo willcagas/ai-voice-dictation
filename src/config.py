@@ -26,7 +26,7 @@ class Config:
     llm_model: str
     
     # Dictation mode
-    mode: Literal["email", "message", "prompt", "notes"]
+    mode: Literal["default", "message", "email", "notes", "prompt"]
     
     # Auto-paste setting
     auto_paste: bool
@@ -53,10 +53,10 @@ class Config:
         self.llm_model = os.getenv("LLM_MODEL", "gpt-4o-mini")
         
         # Dictation mode
-        mode_val = os.getenv("MODE", "message").lower()
-        if mode_val not in ("email", "message", "prompt", "notes"):
-            logger.warning(f"Invalid MODE '{mode_val}', defaulting to 'message'")
-            mode_val = "message"
+        mode_val = os.getenv("MODE", "default").lower()
+        if mode_val not in ("default", "message", "email", "notes", "prompt"):
+            logger.warning(f"Invalid MODE '{mode_val}', defaulting to 'default'")
+            mode_val = "default"
         self.mode = mode_val  # type: ignore
         
         # Auto-paste

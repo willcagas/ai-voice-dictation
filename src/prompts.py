@@ -80,9 +80,19 @@ Apply smart formatting:
 
 Dictation: {transcript}"""
 
+DEFAULT_MODE_PROMPT = """Clean up this dictated text.
+Remove filler words, fix grammar, and polish for readability.
+Preserve the natural voice and tone.
+
+Dictation: {transcript}"""
+
 MESSAGE_MODE_PROMPT = """Clean up this dictated text for a casual message.
-Keep the casual tone. Minimal formatting needed.
-Remove filler words but preserve the natural conversational style.
+IMPORTANT FORMATTING RULES:
+- Output everything in lowercase letters only (no capital letters at all)
+- Do NOT include any punctuation at the very end of the output
+- Periods ARE allowed between sentences if there are multiple sentences
+- Keep the casual, conversational tone
+- Remove filler words
 
 Dictation: {transcript}"""
 
@@ -127,9 +137,11 @@ def get_user_prompt(mode: str, transcript: str) -> str:
     """
     if mode == "email":
         return EMAIL_MODE_PROMPT.format(transcript=transcript)
+    elif mode == "message":
+        return MESSAGE_MODE_PROMPT.format(transcript=transcript)
     elif mode == "prompt":
         return PROMPT_MODE_PROMPT.format(transcript=transcript)
     elif mode == "notes":
         return NOTES_MODE_PROMPT.format(transcript=transcript)
     else:
-        return MESSAGE_MODE_PROMPT.format(transcript=transcript)
+        return DEFAULT_MODE_PROMPT.format(transcript=transcript)

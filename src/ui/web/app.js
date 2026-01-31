@@ -11,7 +11,7 @@ const waveformCanvas = document.getElementById('waveform');
 const ctx = waveformCanvas.getContext('2d');
 
 // State
-let currentMode = 'message';
+let currentMode = 'default';
 let autoPaste = false;
 let waveformBars = new Array(20).fill(0);
 let animationFrame = null;
@@ -83,10 +83,11 @@ function showMenu() {
 // Toggle between modes
 async function toggleMode() {
     let newMode;
-    if (currentMode === 'message') newMode = 'email';
+    if (currentMode === 'default') newMode = 'message';
+    else if (currentMode === 'message') newMode = 'email';
     else if (currentMode === 'email') newMode = 'notes';
     else if (currentMode === 'notes') newMode = 'prompt';
-    else newMode = 'message';
+    else newMode = 'default';
 
     currentMode = newMode;
 
@@ -112,7 +113,7 @@ function updateMenuDisplay() {
     if (modeLabel) modeLabel.textContent = currentMode.toUpperCase();
 
     if (modeControl) {
-        modeControl.classList.remove('show-email', 'show-message', 'show-prompt', 'show-notes');
+        modeControl.classList.remove('show-default', 'show-email', 'show-message', 'show-prompt', 'show-notes');
         modeControl.classList.add(`show-${currentMode}`);
     }
 }
@@ -255,10 +256,11 @@ function updateModeDisplay() {
     modeBadge.textContent = currentMode.toUpperCase();
 
     // Reset classes
-    modeBadge.classList.remove('message', 'prompt', 'notes');
+    modeBadge.classList.remove('default', 'message', 'prompt', 'notes');
 
-    // Add active class if not default (email)
-    if (currentMode === 'message') modeBadge.classList.add('message');
+    // Add active class based on mode
+    if (currentMode === 'default') modeBadge.classList.add('default');
+    else if (currentMode === 'message') modeBadge.classList.add('message');
     else if (currentMode === 'prompt') modeBadge.classList.add('prompt');
     else if (currentMode === 'notes') modeBadge.classList.add('notes');
 }

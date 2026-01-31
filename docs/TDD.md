@@ -1,10 +1,11 @@
-# TDD — Minimal AI Voice Dictation (macOS, Push-to-Talk, Whisper.cpp + Cloud Rewriter)
+# TDD — AViD: AI Voice Dictation (macOS, Push-to-Talk, Whisper.cpp + Cloud Rewriter)
 
-**Goal:** A lightweight, personal dictation tool on macOS (no Electron, no Swift) that uses:
+**Goal:** A lightweight, personal dictation tool on macOS that uses:
 
 * **Local ASR**: `whisper.cpp` (fast, private for audio)
-* **AI formatting**: a **cloud LLM** to rewrite into **Email mode** or **Message mode**
+* **AI formatting**: a **cloud LLM** to rewrite into **Email**, **Message**, or **Prompt** mode
 * **Push-to-talk**: hold a key to record, release to transcribe + rewrite + paste
+* **Visual overlay**: Floating UI with waveform visualization and mode controls
 
 ---
 
@@ -16,17 +17,21 @@
 
   * On keydown: start recording
   * On keyup: stop recording and process
-* Two output modes:
+* Three output modes:
 
   * **Email**: professional, complete sentences, nice punctuation/paragraphs
   * **Message**: casual, short, conversational
+  * **Prompt**: AI prompt engineering using CO-STAR framework (Context, Objective, Style, Tone, Audience, Response)
 * Output behavior:
 
   * Always copy to clipboard
   * Optional: auto-paste into the focused app
 * Runs as a lightweight background app:
 
-  * Either “script you run” OR a packaged `.app` you can launch at login
+  * LaunchAgent service that starts at login
+  * Floating UI overlay with waveform visualization
+  * Draggable window that maintains position between states
+  * Smart click detection (distinguishes taps from drags)
 * Safe rewriting:
 
   * Don’t add new facts
@@ -76,10 +81,17 @@
 * Always: `pbcopy` (clipboard)
 * Optional paste: `osascript` to press ⌘V (requires Accessibility permission)
 
-### Minimal UI (optional)
+### UI Overlay
 
-* v1: none (CLI logs)
-* v2: menubar via `rumps` (still no Swift, still light)
+* **Implemented**: pywebview-based floating overlay
+* **Features**:
+  * Waveform visualization during recording
+  * Processing spinner with mode badge
+  * Settings menu for mode switching
+  * Draggable, maintains position across resize
+  * Smart click detection (tap vs drag/long-press)
+  * Dynamic window resizing (60x60 idle, 260x80 expanded)
+  * Instant feedback (no lingering "Copied!" message)
 
 ---
 
@@ -223,6 +235,13 @@ Use **one system prompt** + **one user message**:
 
 * **Email mode**: professional, full sentences, clean paragraphing, concise; optional greeting/signoff only if user said it
 * **Message mode**: casual, short, conversational; minimal punctuation ok; no greeting/signoff
+* **Prompt mode**: AI Prompt Engineer using CO-STAR framework
+  * **C**ontext: Background information
+  * **O**bjective: What the AI should accomplish
+  * **S**tyle: Writing style to use
+  * **T**one: Emotional tone
+  * **A**udience: Target audience
+  * **R**esponse: Expected response format
 
 ### Safety/factuality
 
@@ -306,51 +325,46 @@ At ~2000 words/week, formatter cost is effectively **pennies/month** on “mini�
 
 * Add LaunchAgent `.plist` that starts your tool on boot
 
-### Phase 5 — UI Overlay + Audio Feedback
+### Phase 5 — UI Overlay + Audio Feedback ✅ COMPLETED
 
-Visual and audio feedback when dictating:
+**Implemented Features:**
 
-#### UI Features
-* **Recording overlay**: Shows waveform/visualization when recording
-* **Processing indicator**: Animation while transcribing/formatting
-* **Audio feedback**: Sound cues on start/stop recording
-* **Settings panel**: Configure mode, auto-paste, hotkey, etc.
-* **Draggable panel**: Movable overlay that stays on top
+#### Visual Overlay (pywebview)
+* **Idle state**: 60x60px floating icon (draggable)
+* **Recording state**: 260x80px with live waveform visualization
+* **Processing state**: Spinner with mode badge
+* **Settings menu**: Mode toggle (Email/Message/Prompt), accessible via tap
 
-#### Technology Options (Research)
+#### Smart Interactions
+* **Tap detection**: < 300ms click opens menu
+* **Long press/drag**: > 300ms or movement > 5px = window drag (no menu)
+* **Dynamic resizing**: Window expands/contracts around current center point
+* **Position memory**: Maintains user-dragged position across state changes
 
-| Option | Pros | Cons |
-|--------|------|------|
-| **Electron + React** | Full control, modern UI, rich ecosystem (e.g., OpenWhispr uses this) | Heavy (~100MB), separate JS stack |
-| **pywebview** | Python-first, native webview, lightweight, bundler-friendly | Limited native integration |
-| **NiceGUI** | Pure Python, browser-based, Vue.js UI, real-time updates | Runs web server, less "native" feel |
-| **Tkinter/CustomTkinter** | Built-in, no extra deps, native look | Dated look, limited animation support |
-| **PyQt6/PySide6** | Full native UI, rich widgets, good theming | Larger dependency, complex licensing |
+#### Visual Design
+* **Color themes**:
+  * Email mode: Purple (#667eea)
+  * Message mode: Green (#38ef7d)
+  * Prompt mode: Orange (#FF9F43)
+* **Animations**: Flash feedback on mode switch, smooth state transitions
+* **No shadows**: Flat design for minimal visual footprint
 
-#### Recommended: pywebview + HTML/CSS/JS
+#### Audio Feedback
+* Start recording: Subtle beep
+* Stop recording: Confirmation tone
+* Bundled WAV files in `src/ui/sounds/`
 
-* Stays Python-centric (matches existing codebase)
-* Modern UI via web technologies (CSS animations, waveform canvas)
-* Lightweight (~5MB vs ~100MB for Electron)
-* Can create floating transparent windows
-* Bundler-friendly with py2app
+#### Implementation Details
+* **Technology**: pywebview (Python-first, native webview)
+* **UI Stack**: HTML/CSS/JS with Canvas API for waveform
+* **Communication**: Python ↔ JS bridge via `window.pywebview.api`
+* **Window Management**: Dynamic resize with center-point preservation
+* **State Management**: `set_ui_state('idle'|'expanded')` triggers resize
 
-#### UX Patterns (from Superwhisper/OpenWhispr)
-
-1. **Press hotkey** → play "start" sound → show overlay with waveform
-2. **While recording** → animate waveform based on audio amplitude
-3. **Release hotkey** → play "stop" sound → show processing spinner
-4. **Done** → flash success indicator → hide overlay OR show text preview
-5. **Draggable** → user can reposition the overlay anywhere on screen
-
-#### Implementation Plan
-
-1. Create `ui/` directory with HTML/CSS/JS for overlay
-2. Add `DictationWindow` class using pywebview
-3. Integrate waveform visualization using Web Audio API or canvas
-4. Add audio feedback sounds (bundled WAV files)
-5. Create settings panel (mode toggle, auto-paste, hotkey config)
-6. Communicate between Python ↔ JS via pywebview bridge
+#### Usage Logging
+* Real-time OpenAI token usage logging in terminal
+* Format: `[INFO] OpenAI Usage: {prompt} prompt + {completion} completion tokens`
+* Helps track API consumption without waiting for dashboard updates
 
 ---
 
@@ -391,7 +405,7 @@ You can run it daily when:
 brew install whisper-cpp
 python3 -m venv .venv
 source .venv/bin/activate
-pip install sounddevice numpy pynput python-dotenv requests scipy
+pip install sounddevice numpy pynput python-dotenv requests scipy pywebview
 ```
 
 ### Model

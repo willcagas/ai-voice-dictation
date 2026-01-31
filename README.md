@@ -9,7 +9,7 @@
 ---
 
 > **internal-tool**: This project is built primarily for the creator's personal workflow. <br>
-> You are free to fork and use it, but you must bring your own **OpenAI API Key** for the AI formatting features. Support is limited.
+> You are free to fork and use it, but you must bring your own **OpenAI API Key** for the AI formatting features.
 
 ## Overview
 
@@ -132,4 +132,4 @@ If you modify the code, you can instantly reload the background service without 
 
 ## License
 
-MIT - Use at your own risk.
+MIT

@@ -18,8 +18,9 @@
 - **Local Transcription**: Uses `whisper.cpp` (Metal accelerated) for fast, private ASR.
 - **AI Formatting**: Cloud LLM rewrites your raw speech into structured text.
 - **Push-to-Talk**: Hold `Right Option` (configurable) to record. Release to process.
-- **4 Output Modes**:
-  - **Message**: Casual, conversational (default)
+- **5 Output Modes** (toggle via UI):
+  - **Default**: Standard cleanup (starting mode)
+  - **Message**: Casual, all lowercase, no trailing punctuation
   - **Email**: Professional, complete sentences
   - **Notes**: Semi-structured, scannable notes
   - **Prompt**: AI prompt engineering using CO-STAR framework

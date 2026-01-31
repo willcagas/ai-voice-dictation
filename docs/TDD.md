@@ -3,7 +3,7 @@
 **Goal:** A lightweight, personal dictation tool on macOS that uses:
 
 * **Local ASR**: `whisper.cpp` (fast, private for audio)
-* **AI formatting**: a **cloud LLM** to rewrite into **Message**, **Email**, **Notes**, or **Prompt** mode
+* **AI formatting**: a **cloud LLM** to rewrite into **Default**, **Message**, **Email**, **Notes**, or **Prompt** mode
 * **Push-to-talk**: hold a key to record, release to transcribe + rewrite + paste
 * **Visual overlay**: Floating UI with waveform visualization and mode controls
 
@@ -17,9 +17,10 @@
 
   * On keydown: start recording
   * On keyup: stop recording and process
-* Four output modes:
+* Five output modes:
 
-  * **Message**: casual, short, conversational
+  * **Default**: standard cleanup, natural voice preserved (starting mode)
+  * **Message**: casual, all lowercase, no trailing punctuation
   * **Email**: professional, complete sentences, nice punctuation/paragraphs
   * **Notes**: semi-structured, scannable, fragment-tolerant (no invention of content)
   * **Prompt**: AI prompt engineering using CO-STAR framework (Context, Objective, Style, Tone, Audience, Response)
@@ -130,9 +131,9 @@
 
 6. **ModeManager**
 
-   * Stores current mode (`message` / `email` / `notes` / `prompt`)
-   * Cycle order: message → email → notes → prompt
-   * Optional per-app default later
+   * Stores current mode (`default` / `message` / `email` / `notes` / `prompt`)
+   * Cycle order: default → message → email → notes → prompt
+   * Mode is managed via UI, not environment variable
 
 ---
 
@@ -184,7 +185,6 @@ ai-dictation/
 
 * `OPENAI_API_KEY=...`
 * `LLM_MODEL=gpt-4o-mini` (or equivalent mini model you choose)
-* `MODE=message` (default; options: message, email, notes, prompt)
 * `AUTO_PASTE=false`
 * `WHISPER_BIN=whisper-cpp`
 * `WHISPER_MODEL_PATH=~/models/whisper/ggml-base.en.bin`
@@ -192,8 +192,9 @@ ai-dictation/
 
 ### Defaults
 
-* Start in `message` mode (most common use case for quick replies)
-* Mode cycle: message → email → notes → prompt
+* Start in `default` mode (standard cleanup with natural voice)
+* Mode cycle: default → message → email → notes → prompt
+* Mode is managed dynamically via the UI overlay
 * Auto-paste off until permissions are set.
 
 ---
@@ -236,8 +237,9 @@ Use **one system prompt** + **one user message**:
 
 #### Mode prompts
 
+* **Default mode**: standard cleanup, polished for readability while preserving natural voice and tone
 * **Email mode**: professional, full sentences, clean paragraphing, concise; optional greeting/signoff only if user said it
-* **Message mode**: casual, short, conversational; minimal punctuation ok; no greeting/signoff
+* **Message mode**: casual, all lowercase, no trailing punctuation (periods allowed between sentences)
 * **Notes mode**: semi-structured, scannable notes
   * Favors clarity over polish
   * Accepts fragments and incomplete sentences

@@ -13,12 +13,16 @@
 
 ## Overview
 
-**AViD** allows you to dictate text using Push-to-Talk, transcibing it locally with `whisper.cpp` for speed and privacy, then instantly rewriting it via GPT-4o into professional emails or casual messages before auto-pasting it into your active window.
+**AViD** allows you to dictate text using Push-to-Talk, transcribing it locally with `whisper.cpp` for speed and privacy, then instantly rewriting it via GPT-4o into polished text before auto-pasting it into your active window.
 
 - **Local Transcription**: Uses `whisper.cpp` (Metal accelerated) for fast, private ASR.
 - **AI Formatting**: Cloud LLM rewrites your raw speech into structured text.
 - **Push-to-Talk**: Hold `Right Option` (configurable) to record. Release to process.
-- **Context Aware**: Two distinct modes—**Email** (Professional) and **Message** (Casual).
+- **4 Output Modes**:
+  - **Message**: Casual, conversational (default)
+  - **Email**: Professional, complete sentences
+  - **Notes**: Semi-structured, scannable notes
+  - **Prompt**: AI prompt engineering using CO-STAR framework
 - **Auto-Paste**: Directly injects the formatted text into your focused application.
 
 ## Prerequisites

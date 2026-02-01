@@ -55,7 +55,7 @@ curl -L -o ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/avid.git
+git clone https://github.com/willcagas/avid.git
 cd avid
 
 # Setup Virtual Environment
